@@ -1,79 +1,112 @@
 <template>
+  <router-view v-slot="{ Component }">
   <div class="background">
-    <img src="https://wallpaperwaifu.com/wp-content/uploads/2023/12/retro-tropical-synthwave-thumb.jpg">
+    <img src="https://wallpaperwaifu.com/wp-content/uploads/2023/12/retro-tropical-synthwave-thumb.jpg"/>
   </div>
-  <div class="container mt-3"> 
-    <button v-if="!showOnlyUnfinished" class="btn btn-info" @click="toggleFilter" style="margin-bottom: 5px;">Tampilkan Belum Selesai</button>
-    <button v-else class="btn btn-warning" @click="toggleFilter">Remove Filter</button>
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Kegiatan</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="item in filteredActivities" :key="item.id">
-          <td :class="{ 'text-decoration-line-through': item.status === 'Selesai' }">{{ item.name }}</td>
-          <td>{{ item.status }}</td>
-          <td>
-            <button v-if="item.status === 'Belum Selesai'" class="btn btn-success" @click="markAsDone(item)">Selesai</button>
-            <button v-else class="btn btn-danger" @click="cancel(item)" style="background-color: orange;margin-right: 8px;">Batal</button>
-            <button class="btn btn-danger" @click="removeActivity(item)"style=" margin-left: 8px;" >Hapus</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="mb-3">
-      <input v-model="newActivity" class="form-control" placeholder="Add new activity">
-      <button class="btn btn-primary mt-2" @click="addActivity">Add Activity</button>
-    </div>
-  </div>
+  <q-layout view="hHh lpR fFf">
+    <q-header style="background-color: transparent; z-index: 1; backdrop-filter: blur(5px); padding-top: 10px; padding-bottom: 10px;">
+      <q-toolbar>
+        <div class="nav-buttons">
+          <q-btn 
+            class="q-ma-sm" 
+            label="TUDOS" 
+            @click="navigateTo('/tudos')" 
+            :class="{ active: $route.path === '/tudos' }"
+            style="background-color: lightskyblue;"
+          />
+          <q-btn 
+            class="q-ma-sm" 
+            label="POST" 
+            @click="navigateTo('/post')" 
+            :class="{ active: $route.path === '/post' }"
+            style="background-color: lightseagreen;"
+          />
+          <q-btn 
+            class="q-ma-sm" 
+            label="ALBUM" 
+            @click="navigateTo('/album')" 
+            :class="{ active: $route.path === '/album' }"
+            style="background-color: lightcoral;"
+          />
+        </div>
+      </q-toolbar>
+    </q-header>
+
+    <q-page-container>
+      <transition
+        @before-enter="beforeEnter"
+        @enter="enter"
+        @leave="leave"
+      >
+      <component :is="Component" />
+        
+      </transition>
+    
+    </q-page-container>
+  </q-layout>
+</router-view>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import anime from 'animejs/lib/anime.es.js';
 
-const activities = ref([
-  { id: 1, name: 'Main Mobile legend', status: 'Belum Selesai' },
-  { id: 2, name: 'Kuliah satu minggu', status: 'Selesai' },
-  { id: 3, name: 'Kepanam', status: 'Belum Selesai' },
-  { id: 4, name: 'Antar teman', status: 'Selesai' }
-]);
-const newActivity = ref('');
-const showOnlyUnfinished = ref(false);
+const router = useRouter();
 
-const filteredActivities = computed(() => {
-  return showOnlyUnfinished.value ? activities.value.filter(a => a.status === 'Belum Selesai') : activities.value;
-});
 
-function addActivity() {
-  if (newActivity.value.trim()) {
-    activities.value.push({ id: Date.now(), name: newActivity.value, status: 'Belum Selesai' });
-    newActivity.value = '';
-  }
+function navigateTo(route) {
+  router.push(route);
 }
 
-function markAsDone(activity) {
-  activity.status = 'Selesai';
+function beforeEnter(el) {
+  el.style.opacity = 0;
+  el.style.transform = 'translateX(100%)';
 }
 
-function cancel(activity) {
-  activity.status = 'Belum Selesai';
+function enter(el, done) {
+  anime({
+    targets: el,
+    opacity: [0, 1],
+    translateX: ['100%', '0%'],
+    duration: 500,
+    easing: 'easeInOutQuad',
+    complete: done,
+  });
 }
 
-function removeActivity(activity) {
-  activities.value = activities.value.filter(a => a !== activity);
-}
-
-function toggleFilter() {
-  showOnlyUnfinished.value = !showOnlyUnfinished.value;
+function leave(el, done) {
+  anime({
+    targets: el,
+    opacity: [1, 0],
+    translateX: ['0%', '-100%'],
+    duration: 500,
+    easing: 'easeInOutQuad',
+    complete: done,
+  });
 }
 </script>
 
-<style scoped>
-.background img{
+<style>
+body {
+  background-color: #1e1e1e;
+  color: white;
+}
+
+.nav-buttons {
+  display: inline-flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.text {
+  margin-top: 20px;
+  margin-left: 715px;
+  font-weight: bold;
+  color: white;
+}
+
+.background img {
   position: fixed;
   top: 0;
   left: 0;
@@ -84,25 +117,15 @@ function toggleFilter() {
   overflow: hidden;
   z-index: -2;
   object-fit: cover;
-  -webkit-background-size:cover; -moz-background-size:cover; -o-background-size:cover; background-size: cover;
+  -webkit-background-size: cover; 
+  -moz-background-size: cover; 
+  -o-background-size: cover; 
+  background-size: cover;
   filter: brightness(0.8);
 }
-.container{
-  height: 100%;
-  margin-left: -50%;
-}
-tr td{
-  background-color: transparent;
-  backdrop-filter: blur(8px);
-  color: wheat;
-  font-weight: bold;
-}
-tr th{
-  background-color: gray;
-  font-weight: bolder;
-}
-.form-control{
-  background-color: transparent;
-  backdrop-filter: blur(5px);
+
+.active {
+  background-color: #007bff; 
+  color: white;
 }
 </style>

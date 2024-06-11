@@ -9,13 +9,21 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@quasar/extras": "^1.16.11",
+    "animejs": "^3.2.2",
+    "axios": "^1.7.2",
     "boostrap": "^2.0.0",
     "bootstrap": "^5.3.3",
+    "pinia": "^2.1.7",
+    "quasar": "^2.16.4",
+    "sweetalert2": "^11.11.1",
     "vue": "^3.4.21",
-    "vue-router": "^4.3.0"
+    "vue-router": "^4.3.2"
   },
   "devDependencies": {
+    "@quasar/vite-plugin": "^1.7.0",
     "@vitejs/plugin-vue": "^5.0.4",
+    "sass": "^1.33.0",
     "vite": "^5.2.8"
   }
 }
